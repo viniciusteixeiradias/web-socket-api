@@ -11,12 +11,11 @@ module.exports = (server) => {
     // New Connection
     console.log(`Web Socket Connected ${ws.id}`)
 
-    if (messages.length > 0) {
+    if (messages.length > 0)
       messages.forEach(message => {
         ws.send(JSON.stringify(message))
       })
 
-    }
 
     // Received Messages
     ws.on('message', function incoming(message){
@@ -28,11 +27,6 @@ module.exports = (server) => {
     ws.on("error", (err) => console.error(`onError: ${err.message}`));
   });
 
-  // wss.broadcast = function broadcast(msg){
-  //   wss.clients.forEach(function each(client){
-  //     client.send(JSON.stringify(msg));
-  //   });
-  // };
   wss.broadcast = function broadcast(msg, ws){
     wss.clients.forEach(function each(client){
       console.log("entrei")
