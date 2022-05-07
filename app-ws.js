@@ -5,19 +5,41 @@ module.exports = (server) => {
     server
   });
 
+  let messages = []
+
   wss.on("connection", (ws) =>{
-    console.log(`Web Socket Connected ${wss.id}`)
+    // New Connection
+    console.log(`Web Socket Connected ${ws.id}`)
+
+    if (messages.length > 0) {
+      messages.forEach(message => {
+        ws.send(JSON.stringify(message))
+      })
+
+    }
+
+    // Received Messages
     ws.on('message', function incoming(message){
       console.log('received: ', JSON.parse(message));
       const mensagem = JSON.parse(message)
-      wss.broadcast(mensagem)
+      messages.push(mensagem)
+      wss.broadcast(mensagem, ws)
     });
     ws.on("error", (err) => console.error(`onError: ${err.message}`));
   });
 
-  wss.broadcast = function broadcast(msg){
+  // wss.broadcast = function broadcast(msg){
+  //   wss.clients.forEach(function each(client){
+  //     client.send(JSON.stringify(msg));
+  //   });
+  // };
+  wss.broadcast = function broadcast(msg, ws){
     wss.clients.forEach(function each(client){
-      client.send(JSON.stringify(msg));
+      console.log("entrei")
+      console.log(client !== ws)
+      if (client.readyState === WebSocket.OPEN && client !== ws) {
+        client.send(JSON.stringify(msg));
+      }
     });
   };
 
